@@ -20,7 +20,7 @@ mu = require "musicutil"
 
 -------- variables --------
 
-local pset_load = false
+local pset_load = true
 local shift = false
 local pageNum = 1
 local seq_focus = 1
@@ -214,25 +214,65 @@ end
 -------- defaults --------
 
 function set_defaults()
-  params:set("rytm_to_seq1"..1, 2)
-  params:set("rytm_to_seq1"..2, 1)
-  params:set("rytm_to_seq1"..3, 2)
-  params:set("rytm_to_seq1"..4, 2)
-
-  params:set("rytm_to_seq2"..1, 1)
-  params:set("rytm_to_seq2"..2, 2)
-  params:set("rytm_to_seq2"..3, 1)
-  params:set("rytm_to_seq2"..4, 1)
-
-  params:set("rytm_to_oct"..1, 1)
-  params:set("rytm_to_oct"..2, 1)
-  params:set("rytm_to_oct"..3, 2)
-  params:set("rytm_to_oct"..4, 1)
-
-  params:set("rytm_div"..1, 7)
-  params:set("rytm_div"..2, 6)
-  params:set("rytm_div"..3, 7)
-  params:set("rytm_div"..4, 13)
+   -- Global settings
+   params:set("scale_mode", 1)
+   params:set("clk_division", 1)
+   params:set("voice_allocation", 1)
+   params:set("midi_device", 1)
+   params:set("midi_trnsp", 1)
+ 
+   -- Oscillator 1
+   params:set("osc_assign1", 2)
+   params:set("sub1_assign1", 1)
+   params:set("sub2_assign1", 1)
+   params:set("oct_assign1", 2)
+   params:set("freq_osc1", 60)
+   params:set("freq_sub11", 1)
+   params:set("freq_sub21", 1)
+   params:set("level_osc1", 10.0)
+   params:set("level_sub11", 0.0)
+   params:set("level_sub21", 0.0)
+ 
+   -- Oscillator 2
+   params:set("osc_assign2", 2)
+   params:set("sub1_assign2", 1)
+   params:set("sub2_assign2", 1)
+   params:set("oct_assign2", 2)
+   params:set("freq_osc2", 60)
+   params:set("freq_sub12", 1)
+   params:set("freq_sub22", 1)
+   params:set("level_osc2", 10.0)
+   params:set("level_sub12", 0.0)
+   params:set("level_sub22", 0.0)
+ 
+   -- Rhythm 1-4
+   for i = 1, 4 do
+     params:set("rytm_div"..i, 1)
+     params:set("rytm_to_seq1"..i, 1)
+     params:set("rytm_to_seq2"..i, 1)
+     params:set("rytm_to_oct"..i, 1)
+     params:set("crow_env"..i, 1)
+     params:set("env_amp"..i, 5.0)
+     params:set("env_attack"..i, 0.0)
+     params:set("env_decay"..i, 0.4)
+   end
+ 
+   -- Pattern parameters
+   params:set("pattern_one1", 8)
+   params:set("pattern_two1", 1)
+   params:set("pattern_oct1", 0)
+   params:set("pattern_one2", 1)
+   params:set("pattern_two2", 10)
+   params:set("pattern_oct2", 0)
+   params:set("pattern_one3", 11)
+   params:set("pattern_two3", 17)
+   params:set("pattern_oct3", 1)
+   params:set("pattern_one4", 2)
+   params:set("pattern_two4", 24)
+   params:set("pattern_oct4", 0)
+  
+  -- triggered by "reset to defaults" param
+  params:bang()
 end
 
 
@@ -252,6 +292,12 @@ function init()
 
   params:add_trigger("connect_jf", "reconnect jf")
   params:set_action("connect_jf", function() crow.ii.jf.mode(1) end)
+
+  -- use the original defaults defined in the script
+  params:add_trigger("reset_defaults", "reset to defaults")
+  params:set_action("reset_defaults", function() 
+    set_defaults()
+  end)
 
   build_midi_device_list()
 
@@ -359,10 +405,9 @@ function init()
   end
 
   if pset_load then
-    params:default()
+    params:read()  -- Read pset in  pset-last.txt if exists
   else
-    params:bang()
-    set_defaults()
+    set_defaults()   -- Apply default values otherwise
   end
   
   --callbacks
