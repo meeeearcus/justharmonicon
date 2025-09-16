@@ -405,7 +405,7 @@ function init()
   end
 
   if pset_load then
-    params:read()  -- Read pset in  pset-last.txt if exists
+    params:default() -- Read the default .pset file from disk, if available
   else
     set_defaults()   -- Apply default values otherwise
   end
