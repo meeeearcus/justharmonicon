@@ -258,21 +258,12 @@ function set_defaults()
    end
  
    -- Pattern parameters
-   params:set("pattern_one1", 8)
-   params:set("pattern_two1", 1)
-   params:set("pattern_oct1", 0)
-   params:set("pattern_one2", 1)
-   params:set("pattern_two2", 10)
-   params:set("pattern_oct2", 0)
-   params:set("pattern_one3", 11)
-   params:set("pattern_two3", 17)
-   params:set("pattern_oct3", 1)
-   params:set("pattern_one4", 2)
-   params:set("pattern_two4", 24)
-   params:set("pattern_oct4", 0)
-  
-  -- triggered by "reset to defaults" param
-  params:bang()
+   for i = 1, 4 do
+     params:set("pattern_one"..i, 13)
+     params:set("pattern_two"..i, 13)
+     params:set("pattern_oct"..i, 0)
+   end
+
 end
 
 
@@ -294,7 +285,7 @@ function init()
   params:set_action("connect_jf", function() crow.ii.jf.mode(1) end)
 
   -- use the original defaults defined in the script
-  params:add_trigger("reset_defaults", "reset to defaults")
+  params:add_trigger("reset_defaults", "reset ALL params")
   params:set_action("reset_defaults", function() 
     set_defaults()
   end)
@@ -409,6 +400,9 @@ function init()
   else
     set_defaults()   -- Apply default values otherwise
   end
+
+  -- Update the UI
+  params:bang()
   
   --callbacks
   midi.add = midi_connect
